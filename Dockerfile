@@ -1,12 +1,9 @@
-# Specify a base image
-FROM node:alpine
-
-WORKDIR /usr/app
-
-# Install some depenendencies
-COPY ./package.json ./
+FROM node:alpine as builder
+WORKDIR '/app'
+COPY package.json .
 RUN npm install
-COPY ./ ./
+COPY . .
+RUN npm run build
 
-# Default command
-CMD ["npm", "start"]
+FROM nginx
+COPY --from=builder /app/build /usr/share/nginx/html
